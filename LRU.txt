@@ -1,0 +1,43 @@
+#include <stdio.h>
+
+int main() {
+    int pages[] = {1,2,3,1,4};
+    int frame[3] = {-1,-1,-1};
+    int used[3] = {0};
+    int time = 0, found;
+
+    for(int i=0; i<5; i++) {
+        found = 0;
+
+        // check hit
+        for(int j=0; j<3; j++) {
+            if(frame[j] == pages[i]) {
+                time++;
+                used[j] = time;
+                found = 1;
+                break;
+            }
+        }
+
+        // if miss → replace LRU
+        if(!found) {
+            int lru = 0;
+            for(int j=1; j<3; j++) {
+                if(used[j] < used[lru])
+                    lru = j;
+            }
+
+            time++;
+            frame[lru] = pages[i];
+            used[lru] = time;
+        }
+
+        // print frames
+        for(int j=0; j<3; j++)
+            printf("%d ", frame[j]);
+
+        printf("\n");
+    }
+
+    return 0;
+}
