@@ -1,0 +1,18 @@
+zombie
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    int pid = fork();
+
+    if(pid > 0) {
+        sleep(10);
+        printf("Parent Process\n");
+    }
+    else {
+        printf("Child Process Finished\n");
+    }
+
+    return 0;
+}
