@@ -1,38 +1,123 @@
-#include <stdio.h>
-#include <semaphore.h>
+//Producer Consumer Problem 
 
-sem_t mutex, full, empty;
+#include<stdio.h>
+#include<stdlib.h>
+
+#define MAX 5
+
+int mutex = 1;
+int full = 0;
+int empty = MAX;
+
+int buffer[MAX];
 int x = 0;
 
-void producer() {
-    sem_wait(&empty);
-    sem_wait(&mutex);
-
-    x++;
-    printf("Produced: %d\n", x);
-
-    sem_post(&mutex);
-    sem_post(&full);
+int wait(int s)
+{
+    return (--s);
 }
 
-void consumer() {
-    sem_wait(&full);
-    sem_wait(&mutex);
-
-    printf("Consumed: %d\n", x);
-    x--;
-
-    sem_post(&mutex);
-    sem_post(&empty);
+int signal(int s)
+{
+    return (++s);
 }
 
-int main() {
-    sem_init(&mutex, 0, 1);
-    sem_init(&full, 0, 0);
-    sem_init(&empty, 0, 1);
+void producer()
+{
+    if((mutex == 1) && (empty != 0))
+    {
+        mutex = wait(mutex);
+        empty = wait(empty);
 
-    producer();
-    consumer();
+        printf("Enter item to produce: ");
+        scanf("%d",&buffer[x]);
+
+        printf("Item produced: %d\n", buffer[x]);
+        x++;
+
+        full = signal(full);
+        mutex = signal(mutex);
+    }
+    else
+    {
+        printf("Buffer is Full\n");
+    }
+}
+
+void consumer()
+{
+    if((mutex == 1) && (full != 0))
+    {
+        mutex = wait(mutex);
+        full = wait(full);
+
+        x--;
+        printf("Item consumed: %d\n", buffer[x]);
+
+        empty = signal(empty);
+        mutex = signal(mutex);
+    }
+    else
+    {
+        printf("Buffer is Empty\n");
+    }
+}
+
+void display()
+{
+    int i;
+
+    if(x == 0)
+    {
+        printf("Buffer is empty\n");
+    }
+    else
+    {
+        printf("Buffer items:\n");
+        for(i=0;i<x;i++)
+        {
+            printf("%d ", buffer[i]);
+        }
+        printf("\n");
+    }
+}
+
+int main()
+{
+    int choice;
+
+    while(1)
+    {
+        printf("\nProducer Consumer Problem\n");
+        printf("1. Produce\n");
+        printf("2. Consume\n");
+        printf("3. Display Buffer\n");
+        printf("4. Exit\n");
+
+        printf("Enter your choice: ");
+        scanf("%d",&choice);
+
+        switch(choice)
+        {
+            case 1:
+                producer();
+                break;
+
+            case 2:
+                consumer();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                exit(0);
+
+            default:
+                printf("Invalid choice\n");
+        }
+    }
 
     return 0;
 }
